@@ -4,6 +4,10 @@ on:
   push:
     branches: [ "master" ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   subtrace/subtrace:
     name: subtrace/subtrace
@@ -15,7 +19,7 @@ jobs:
     - name: docker build
       run: docker build . --push --progress plain --tag "ghcr.io/subtrace/subtrace:${GITHUB_SHA}"
     - name: docker tag
-      run: docker tag "ghcr.io/subtrace/subtrace:${GITHUB_SHA}" ghcr.io/subtrace/subtrace:latest && docker push ghcr.io/subtrace/subtrace:latest
+      run: docker buildx imagetools create --tag ghcr.io/subtrace/subtrace:latest "ghcr.io/subtrace/subtrace:${GITHUB_SHA}"
 
   subtrace/worker:
     name: subtrace/worker
@@ -27,4 +31,4 @@ jobs:
     - name: docker build
       run: docker build . -f worker.Dockerfile --push --progress plain --tag "ghcr.io/subtrace/worker:${GITHUB_SHA}"
     - name: docker tag
-      run: docker tag "ghcr.io/subtrace/worker:${GITHUB_SHA}" ghcr.io/subtrace/worker:latest && docker push ghcr.io/subtrace/worker:latest
+      run: docker buildx imagetools create --tag ghcr.io/subtrace/worker:latest "ghcr.io/subtrace/worker:${GITHUB_SHA}"
